@@ -1,14 +1,46 @@
-node('slave1') {
-   
-    stage('checkout') { 
-        git 'https://github.com/praveenkumar1290/Maven-Web-Project.git'
+pipeline {
+    agent any 
+
+    environment {
+        SONARQUBE_URL = 'http://100.26.52.20:9000/'
+        NEXUS_URL = 'http://100.26.52.20:8081/#browse/browse:maven-releases'
     }
-    
-    stage('build') {
-        bat 'mvn package'
-    }
-       stage('code-quality') {
-        bat 'mvn sonar:sonar -Dsonar.projectKey=guest -Dsonar.host.url=http://localhost:9000 -Dsonar.login=17d0c0b50a0e416b8728c0ba5944169adaa37655'
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/nira4269/Maven-Web-Project.git'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Upload to Nexus') {
+            steps {
+                sh """
+                mvn deploy:deploy-file \
+                -DgroupId=com.mt \
+                -DartifactId=maven-web-project \
+                -Dversion=1.2.1-SNAPSHOT \
+                -Dpackaging=war \
+                -Dfile=target/my-app-1.0.jar \
+                -DrepositoryId=nexus \
+                -Durl=$NEXUS_URL
+                """
+            }
+        }
     }
 }
-  
+
