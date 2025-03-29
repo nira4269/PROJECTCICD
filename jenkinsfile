@@ -1,0 +1,18 @@
+pipeline {
+
+    agent any
+   
+    stages{
+
+        stage('Git checkout'){
+
+            steps{
+                git branch: 'main', url:  'https://github.com/nira4269/Maven-Web-Project.git'
+            }
+            
+        }
+
+    }
+
+    }
+}
