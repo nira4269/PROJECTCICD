@@ -7,12 +7,14 @@ pipeline {
         stage('Git checkout'){
 
             steps{
-                git branch: 'main', url:  'https://github.com/nira4269/Maven-Web-Project.git'
+                git branch: 'main', url: 'https://github.com/nira4269/Maven-Web-Project.git'
             }
-            
         }
+        stage('Unitest'){
 
+            steps{
+                sh 'mvn test'
+            }
+        }
     }
-
-    }
-}
+ }
